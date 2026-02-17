@@ -1,45 +1,100 @@
 {
   "propietarios": [
-    { "id": 1, "nombre": "Jorge Pérez", "email": "jorge@test.com" },
-    { "id": 2, "nombre": "Ana García", "email": "ana@test.com" }
+    {
+      "id": "1",
+      "nombre": "Jorge Pérez",
+      "email": "jorge@test.com"
+    },
+    {
+      "id": "2",
+      "nombre": "Ana García",
+      "email": "ana@test.com"
+    }
   ],
   "viviendas": [
     {
-      "id": 1,
-      "titulo": "Ático Lujo Centro",
-      "precio": 350000.0,
-      "imagen": "https://loremflickr.com/320/240/house",
-      "propietarioId": 1
-    },
-    {
-      "id": 2,
-      "titulo": "Chalet en la Sierra",
-      "precio": 120000.0,
+      "id": "2",
+      "titulo": "Chalet en la Sierra (VENDIDO) (VENDIDO)",
+      "precio": 97200,
       "imagen": "https://loremflickr.com/320/240/cottage",
       "propietarioId": 1
     },
     {
-      "id": 3,
-      "titulo": "Piso Estudiantes",
-      "precio": 80000.0,
+      "id": "3",
+      "titulo": "Piso Estudiantes (VENDIDO)",
+      "precio": 72000,
       "imagen": "https://loremflickr.com/320/240/apartment",
       "propietarioId": 2
+    },
+    {
+      "id": 3508,
+      "titulo": "Nueva Oportunidad 19",
+      "precio": 150000,
+      "imagen": "https://loremflickr.com/320/240/house",
+      "propietarioId": 1
+    },
+    {
+      "id": 2698,
+      "titulo": "Nueva Oportunidad 9",
+      "precio": 150000,
+      "imagen": "https://loremflickr.com/320/240/house",
+      "propietarioId": 1
     }
   ],
   "direcciones": [
-    { "id": 1, "calle": "Gran Vía 20", "ciudad": "Madrid", "viviendaId": 1 },
-    { "id": 2, "calle": "Calle del Bosque 5", "ciudad": "Navacerrada", "viviendaId": 2 },
-    { "id": 3, "calle": "Av. Universidad 4", "ciudad": "Valencia", "viviendaId": 3 }
+    {
+      "id": "1",
+      "calle": "Gran Vía 20",
+      "ciudad": "Madrid",
+      "viviendaId": 1
+    },
+    {
+      "id": "2",
+      "calle": "Calle del Bosque 5",
+      "ciudad": "Navacerrada",
+      "viviendaId": 2
+    },
+    {
+      "id": "3",
+      "calle": "Av. Universidad 4",
+      "ciudad": "Valencia",
+      "viviendaId": 3
+    }
   ],
   "caracteristicas": [
-    { "id": 1, "nombre": "Piscina" },
-    { "id": 2, "nombre": "Wifi" },
-    { "id": 3, "nombre": "Garaje" }
+    {
+      "id": "1",
+      "nombre": "Piscina"
+    },
+    {
+      "id": "2",
+      "nombre": "Wifi"
+    },
+    {
+      "id": "3",
+      "nombre": "Garaje"
+    }
   ],
   "vivienda_caracteristicas": [
-    { "viviendaId": 1, "caracteristicaId": 1 },
-    { "viviendaId": 1, "caracteristicaId": 3 },
-    { "viviendaId": 2, "caracteristicaId": 3 },
-    { "viviendaId": 3, "caracteristicaId": 2 }
+    {
+      "viviendaId": 1,
+      "caracteristicaId": 1,
+      "id": "50fe"
+    },
+    {
+      "viviendaId": 1,
+      "caracteristicaId": 3,
+      "id": "a17b"
+    },
+    {
+      "viviendaId": 2,
+      "caracteristicaId": 3,
+      "id": "3b5a"
+    },
+    {
+      "viviendaId": 3,
+      "caracteristicaId": 2,
+      "id": "7fc6"
+    }
   ]
 }

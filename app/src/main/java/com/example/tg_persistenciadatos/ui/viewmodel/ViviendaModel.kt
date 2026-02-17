@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 
 class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel() {
 
-    // Estado de la UI: Una lista de viviendas
     var listaViviendas by mutableStateOf<List<Vivienda>>(emptyList())
         private set
 
@@ -19,21 +18,59 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
         private set
 
     init {
-        // Al crearse el ViewModel, cargamos los datos automáticamente
         cargarDatos()
     }
 
     fun cargarDatos() {
         viewModelScope.launch {
             isLoading = true
-
-            // 1. Intentamos actualizar desde internet
+            // Intentamos sincronizar con la API, si falla usamos local
             repository.refreshDatos()
-
-            // 2. Leemos lo que haya quedado en la base de datos
             listaViviendas = repository.obtenerViviendasLocales()
-
             isLoading = false
+        }
+    }
+
+    // --- NUEVO: Obtener una vivienda específica para editarla ---
+    fun getVivienda(id: Int): Vivienda? {
+        return listaViviendas.find { it.id == id }
+    }
+
+    // --- NUEVO: Agregar con datos reales ---
+    fun agregarVivienda(titulo: String, precio: Double, imagen: String, propietarioId: Int) {
+        viewModelScope.launch {
+            // Generamos ID temporal random (la API debería asignarlo idealmente)
+            val nueva = Vivienda(
+                id = (1000..9999).random(),
+                titulo = titulo,
+                precio = precio,
+                imagen = imagen,
+                propietarioId = propietarioId
+            )
+            repository.agregar(nueva)
+            cargarDatos()
+        }
+    }
+
+    // --- NUEVO: Actualizar con datos reales ---
+    fun actualizarVivienda(id: Int, titulo: String, precio: Double, imagen: String, propietarioId: Int) {
+        viewModelScope.launch {
+            val viviendaEditada = Vivienda(
+                id = id,
+                titulo = titulo,
+                precio = precio,
+                imagen = imagen,
+                propietarioId = propietarioId
+            )
+            repository.actualizar(viviendaEditada)
+            cargarDatos()
+        }
+    }
+
+    fun borrarVivienda(vivienda: Vivienda) {
+        viewModelScope.launch {
+            repository.borrar(vivienda)
+            cargarDatos()
         }
     }
 }

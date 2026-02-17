@@ -48,7 +48,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.navigation.runtime.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -62,11 +63,10 @@ dependencies {
     // 1. SERIALIZATION
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
-    // 2. ROOM (Versión 2.6.1)
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
-    ksp("androidx.room:room-compiler:$room_version") // Usamos KSP
+    // 2. ROOM
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     // 3. RETROFIT
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

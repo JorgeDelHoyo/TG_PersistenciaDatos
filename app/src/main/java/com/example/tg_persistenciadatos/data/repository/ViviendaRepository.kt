@@ -41,4 +41,19 @@ class ViviendaRepository(private val dao: ViviendaDao) {
     suspend fun obtenerViviendasLocales(): List<Vivienda> {
         return dao.getAllViviendas()
     }
+
+    suspend fun agregar(vivienda: Vivienda) {
+        val nuevaVivienda = api.addVivienda(vivienda) // La API nos devuelve la vivienda con ID real si fuera auto-generado
+        dao.insert(nuevaVivienda)
+    }
+
+    suspend fun actualizar(vivienda: Vivienda) {
+        api.updateVivienda(vivienda.id, vivienda)
+        dao.update(vivienda)
+    }
+
+    suspend fun borrar(vivienda: Vivienda) {
+        api.deleteVivienda(vivienda.id)
+        dao.delete(vivienda)
+    }
 }

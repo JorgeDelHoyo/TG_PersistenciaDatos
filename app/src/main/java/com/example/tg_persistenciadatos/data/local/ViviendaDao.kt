@@ -1,10 +1,12 @@
 package com.example.tg_persistenciadatos.data.local
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.tg_persistenciadatos.model.Caracteristica
 import com.example.tg_persistenciadatos.model.Direccion
 import com.example.tg_persistenciadatos.model.Propietario
@@ -43,4 +45,14 @@ interface ViviendaDao {
     // --- BORRAR TODO (Para limpiar antes de recargar de la API) ---
     @Query("DELETE FROM viviendas")
     suspend fun deleteAll()
+
+    // OPERACIONES CRUD INDIVIDUALES
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(vivienda: Vivienda)
+
+    @Update
+    suspend fun update(vivienda: Vivienda)
+
+    @Delete
+    suspend fun delete(vivienda: Vivienda)
 }
