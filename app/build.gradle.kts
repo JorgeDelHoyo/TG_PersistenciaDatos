@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp) // Sin versión
+    alias(libs.plugins.kotlin.serialization) // Sin versión
 }
 
 android {
@@ -46,7 +48,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.navigation.compose)
+
+    // NAVEGACIÓN (Combinada)
+    implementation(libs.androidx.navigation.compose) // De tu rama
+    implementation(libs.androidx.ui)                 // De la rama entrante
+    implementation(libs.androidx.navigation.runtime.ktx) // De la rama entrante
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -54,10 +61,26 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    // Retrofit y GSON
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    //Navegacio
-    implementation("androidx.navigation:navigation-compose:2.8.5")
 
+    // --- COSAS DE LA PRÁCTICA (Combinadas) ---
+
+    // 1. SERIALIZATION
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // 2. ROOM
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // 3. RETROFIT Y GSON
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0") // Mantenido de tu rama
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0") // De la rama entrante
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // 4. COIL (Para cargar imágenes si las hubiera)
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // 5. VIEWMODEL COMPOSE
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
 }
