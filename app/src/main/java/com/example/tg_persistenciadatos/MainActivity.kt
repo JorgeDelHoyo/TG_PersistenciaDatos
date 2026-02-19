@@ -12,6 +12,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -58,13 +60,17 @@ class MainActivity : ComponentActivity() {
 }
 
 // -----------------------------------------------------------
-// PANTALLA 1: LISTADO (Igual que antes)
+// PANTALLA 1: LISTADO (AHORA CON BOTONES PUT Y DELETE)
 // -----------------------------------------------------------
 @Composable
 fun PantallaLista(onNavigateToCreate: () -> Unit) {
     var listaViviendas by remember { mutableStateOf(emptyList<Vivienda>()) }
     var listaCaracteristicas by remember { mutableStateOf(emptyList<Caracteristica>()) }
     var cargando by remember { mutableStateOf(true) }
+
+    // Necesitamos el contexto y corrutinas para los botones de las tarjetas
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         try {
@@ -74,6 +80,7 @@ fun PantallaLista(onNavigateToCreate: () -> Unit) {
             if (resViviendas.isSuccessful) listaViviendas = resViviendas.body() ?: emptyList()
             if (resCaracteristicas.isSuccessful) listaCaracteristicas = resCaracteristicas.body() ?: emptyList()
         } catch (e: Exception) {
+            Toast.makeText(context, "Error de red: ${e.message}", Toast.LENGTH_SHORT).show()
         } finally {
             cargando = false
         }
@@ -103,10 +110,67 @@ fun PantallaLista(onNavigateToCreate: () -> Unit) {
                             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Text(vivienda.modelo, style = MaterialTheme.typography.titleMedium)
-                                Text("${vivienda.precio} €", style = MaterialTheme.typography.bodyLarge)
-                                Text("Características: $nombresCaracteristicas", style = MaterialTheme.typography.bodySmall)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Columna para los datos de la vivienda
+                                Column(modifier = Modifier.weight(1f).padding(16.dp)) {
+                                    Text(vivienda.modelo, style = MaterialTheme.typography.titleMedium)
+                                    Text("${vivienda.precio} €", style = MaterialTheme.typography.bodyLarge)
+                                    Text("Características: $nombresCaracteristicas", style = MaterialTheme.typography.bodySmall)
+                                }
+
+                                // Columna para los botones (PUT y DELETE)
+                                Column(modifier = Modifier.padding(end = 8.dp)) {
+
+                                    // BOTÓN PUT (Editar): Sumamos 100€ al precio para probar
+                                    IconButton(onClick = {
+                                        scope.launch {
+                                            try {
+                                                val viviendaModificada = vivienda.copy(
+                                                    precio = vivienda.precio + 100,
+                                                    modelo = vivienda.modelo + " *"
+                                                )
+                                                val resp = RetrofitClient.instance.updateVivienda(vivienda.id, viviendaModificada)
+
+                                                if (resp.isSuccessful) {
+                                                    // Actualizamos la lista local para ver el cambio en pantalla
+                                                    listaViviendas = listaViviendas.map {
+                                                        if (it.id == vivienda.id) viviendaModificada else it
+                                                    }
+                                                    Toast.makeText(context, "Actualizado (PUT)", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(context, "Error PUT: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            } catch (e: Exception) {
+                                                Toast.makeText(context, "Fallo: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }) {
+                                        Icon(Icons.Default.Edit, contentDescription = "Editar", tint = MaterialTheme.colorScheme.primary)
+                                    }
+
+                                    // BOTÓN DELETE (Borrar)
+                                    IconButton(onClick = {
+                                        scope.launch {
+                                            try {
+                                                val resp = RetrofitClient.instance.deleteVivienda(vivienda.id)
+                                                if (resp.isSuccessful) {
+                                                    // Quitamos la vivienda de la lista local
+                                                    listaViviendas = listaViviendas.filter { it.id != vivienda.id }
+                                                    Toast.makeText(context, "Borrado (DELETE)", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(context, "Error DELETE: ${resp.code()}", Toast.LENGTH_SHORT).show()
+                                                }
+                                            } catch (e: Exception) {
+                                                Toast.makeText(context, "Fallo: ${e.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }) {
+                                        Icon(Icons.Default.Delete, contentDescription = "Borrar", tint = MaterialTheme.colorScheme.error)
+                                    }
+                                }
                             }
                         }
                     }
@@ -117,7 +181,7 @@ fun PantallaLista(onNavigateToCreate: () -> Unit) {
 }
 
 // -----------------------------------------------------------
-// PANTALLA 2: FORMULARIO (Modificada)
+// PANTALLA 2: FORMULARIO (Mantenida exactamente igual)
 // -----------------------------------------------------------
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,7 +193,7 @@ fun PantallaCrearVivienda(onNavigateBack: () -> Unit) {
     var modelo by remember { mutableStateOf("") }
     var precio by remember { mutableStateOf("") }
 
-    // Datos Dirección (NUEVO: Campos de texto en lugar de lista)
+    // Datos Dirección
     var dirCalle by remember { mutableStateOf("") }
     var dirCiudad by remember { mutableStateOf("") }
     var dirPiso by remember { mutableStateOf("") }
@@ -145,7 +209,7 @@ fun PantallaCrearVivienda(onNavigateBack: () -> Unit) {
     // Control UI
     var expandProp by remember { mutableStateOf(false) }
     var expandCar by remember { mutableStateOf(false) }
-    var guardando by remember { mutableStateOf(false) } // Para deshabilitar botón mientras guarda
+    var guardando by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         val rProp = RetrofitClient.instance.getPropietarios()
@@ -155,7 +219,6 @@ fun PantallaCrearVivienda(onNavigateBack: () -> Unit) {
         if (rCar.isSuccessful) listaCaracteristicas = rCar.body() ?: emptyList()
     }
 
-    // Añadimos scroll por si el formulario es largo
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -172,7 +235,7 @@ fun PantallaCrearVivienda(onNavigateBack: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // SECCION 2: DIRECCIÓN (NUEVO)
+        // SECCION 2: DIRECCIÓN
         Text("Nueva Dirección", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
             Column(modifier = Modifier.padding(8.dp)) {
@@ -229,41 +292,36 @@ fun PantallaCrearVivienda(onNavigateBack: () -> Unit) {
 
         // BOTÓN GUARDAR
         Button(
-            enabled = !guardando, // Evitar doble click
+            enabled = !guardando,
             onClick = {
                 scope.launch {
                     guardando = true
                     try {
-                        // VALIDACIÓN
                         if (propietarioSeleccionado == null) {
                             Toast.makeText(context, "Selecciona un propietario", Toast.LENGTH_SHORT).show()
                             guardando = false
                             return@launch
                         }
 
-                        // PASO 1: CREAR DIRECCIÓN EN EL SERVIDOR
                         val nuevaDireccion = Direccion(
-                            id = 0, // ID temporal, el servidor asignará uno real
+                            id = 0,
                             calle = dirCalle,
                             ciudad = dirCiudad,
                             piso = dirPiso
                         )
 
-                        // Enviamos POST direccion
                         val respDir = RetrofitClient.instance.createDireccion(nuevaDireccion)
 
                         if (respDir.isSuccessful && respDir.body() != null) {
-                            // ¡ÉXITO! Tenemos la dirección creada y su ID real
                             val direccionCreada = respDir.body()!!
                             val idDireccionReal = direccionCreada.id
 
-                            // PASO 2: CREAR VIVIENDA USANDO EL ID DE LA DIRECCIÓN
                             val nuevaVivienda = Vivienda(
                                 id = 0,
                                 modelo = modelo,
                                 precio = precio.toIntOrNull() ?: 0,
                                 propietarioId = propietarioSeleccionado!!.id,
-                                direccionId = idDireccionReal, // <--- Usamos el ID que nos devolvió el servidor
+                                direccionId = idDireccionReal,
                                 caracteristicaIds = caracteristicasSeleccionadas.map { it.id }
                             )
 
