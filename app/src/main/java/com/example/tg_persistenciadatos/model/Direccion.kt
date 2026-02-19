@@ -2,25 +2,12 @@ package com.example.tg_persistenciadatos.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.ForeignKey
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
-@Entity(
-    tableName = "direcciones",
-    foreignKeys = [
-        ForeignKey(
-            entity = Vivienda::class,
-            parentColumns = ["id"],
-            childColumns = ["viviendaId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Entity(tableName = "direcciones")
 data class Direccion(
-    @PrimaryKey(autoGenerate = false)
-    val id: Int,
-    val calle: String,
+    @PrimaryKey(autoGenerate = false) val id: Int,
     val ciudad: String,
-    val viviendaId: Int // FK para relacionar con Vivienda (1:1)
+    val calle: String,
+    @SerializedName("Piso") val piso: String
 )

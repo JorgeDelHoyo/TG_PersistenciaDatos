@@ -4,11 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.tg_persistenciadatos.model.Caracteristica
-import com.example.tg_persistenciadatos.model.Direccion
-import com.example.tg_persistenciadatos.model.Propietario
-import com.example.tg_persistenciadatos.model.Vivienda
-import com.example.tg_persistenciadatos.model.ViviendaCaracteristicaCrossRef
+import com.example.tg_persistenciadatos.model.*
 
 @Database(
     entities = [
@@ -16,29 +12,31 @@ import com.example.tg_persistenciadatos.model.ViviendaCaracteristicaCrossRef
         Propietario::class,
         Direccion::class,
         Caracteristica::class,
-        ViviendaCaracteristicaCrossRef::class // ¡No olvides la tabla de cruce!
+        ViviendaCaracteristicaCrossRef::class // <-- CAMBIADO de Cruce a CrossRef
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
-abstract class AppDatabase : RoomDatabase() {
+abstract class ViviendaDatabase : RoomDatabase() {
 
     abstract fun viviendaDao(): ViviendaDao
 
     companion object {
         @Volatile
-        private var INSTANCE: AppDatabase? = null
+        private var INSTANCE: ViviendaDatabase? = null
 
-        fun getDatabase(context: Context): AppDatabase {
+        fun getDatabase(context: Context): ViviendaDatabase {
             return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(
+                val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    AppDatabase::class.java,
-                    "inmobiliaria_db" // Nombre del archivo en el móvil
+                    ViviendaDatabase::class.java,
+                    "vivienda_database"
                 )
-                    .fallbackToDestructiveMigration() // Si cambias la BD, borra la vieja y crea una nueva (útil en desarrollo)
+                    // Esto evita que la app se cierre si cambias el modelo de datos
+                    .fallbackToDestructiveMigration()
                     .build()
-                    .also { INSTANCE = it }
+                INSTANCE = instance
+                instance
             }
         }
     }

@@ -1,5 +1,9 @@
 package com.example.tg_persistenciadatos.api
 
+import com.example.tg_persistenciadatos.model.Caracteristica
+import com.example.tg_persistenciadatos.model.Direccion
+import com.example.tg_persistenciadatos.model.Propietario
+import com.example.tg_persistenciadatos.model.Vivienda
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -20,11 +24,9 @@ interface InmobiliariaApi {
     @POST("vivienda")
     suspend fun createVivienda(@Body vivienda: Vivienda): Response<Vivienda>
 
-    // Actualizar una vivienda existente
     @PUT("vivienda/{id}")
     suspend fun updateVivienda(@Path("id") id: Int, @Body vivienda: Vivienda): Response<Vivienda>
 
-    // Borrar una vivienda (Unit significa que no esperamos que el servidor devuelva datos, solo el código de éxito 200/204)
     @DELETE("vivienda/{id}")
     suspend fun deleteVivienda(@Path("id") id: Int): Response<Unit>
 

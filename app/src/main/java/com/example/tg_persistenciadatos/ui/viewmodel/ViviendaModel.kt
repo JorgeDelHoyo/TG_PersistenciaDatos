@@ -1,76 +1,72 @@
 package com.example.tg_persistenciadatos.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import android.util.Log
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tg_persistenciadatos.data.repository.ViviendaRepository
+import com.example.tg_persistenciadatos.model.Direccion
+import com.example.tg_persistenciadatos.model.Propietario
 import com.example.tg_persistenciadatos.model.Vivienda
 import kotlinx.coroutines.launch
 
 class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel() {
 
     var listaViviendas by mutableStateOf<List<Vivienda>>(emptyList())
-        private set
-
+    var listaPropietarios by mutableStateOf<List<Propietario>>(emptyList())
     var isLoading by mutableStateOf(false)
-        private set
 
     init {
-        cargarDatos()
+        // Al arrancar, cargamos lo local primero para evitar pantalla negra
+        viewModelScope.launch {
+            cargarDesdeLocal()
+            actualizarTodo()
+        }
     }
 
-    fun cargarDatos() {
+    fun actualizarTodo() {
         viewModelScope.launch {
             isLoading = true
-            // Intentamos sincronizar con la API, si falla usamos local
-            repository.refreshDatos()
-            listaViviendas = repository.obtenerViviendasLocales()
+            try {
+                repository.refreshDatos()
+                cargarDesdeLocal()
+            } catch (e: Exception) {
+                Log.e("VM", "Error refrescando: ${e.message}")
+            }
             isLoading = false
         }
     }
 
-    // --- NUEVO: Obtener una vivienda específica para editarla ---
-    fun getVivienda(id: Int): Vivienda? {
-        return listaViviendas.find { it.id == id }
+    suspend fun cargarDesdeLocal() {
+        listaViviendas = repository.obtenerViviendasLocales()
+        listaPropietarios = repository.obtenerPropietariosLocales()
     }
 
-    // --- NUEVO: Agregar con datos reales ---
-    fun agregarVivienda(titulo: String, precio: Double, imagen: String, propietarioId: Int) {
+    fun getVivienda(id: Int): Vivienda? = listaViviendas.find { it.id == id }
+
+    fun actualizarVivienda(id: Int, modelo: String, precio: Int, propId: Int, dirId: Int) {
         viewModelScope.launch {
-            // Generamos ID temporal random (la API debería asignarlo idealmente)
-            val nueva = Vivienda(
-                id = (1000..9999).random(),
-                titulo = titulo,
-                precio = precio,
-                imagen = imagen,
-                propietarioId = propietarioId
-            )
-            repository.agregar(nueva)
-            cargarDatos()
+            repository.actualizar(Vivienda(id, modelo, precio, propId, dirId))
+            cargarDesdeLocal()
         }
     }
 
-    // --- NUEVO: Actualizar con datos reales ---
-    fun actualizarVivienda(id: Int, titulo: String, precio: Double, imagen: String, propietarioId: Int) {
+    fun guardarViviendaCompleta(modelo: String, precio: Int, propId: Int, calle: String, ciudad: String, piso: String) {
         viewModelScope.launch {
-            val viviendaEditada = Vivienda(
-                id = id,
-                titulo = titulo,
-                precio = precio,
-                imagen = imagen,
-                propietarioId = propietarioId
+            val dirId = (1000..9999).random()
+            val vivId = (10000..99999).random()
+            repository.guardarNuevaVivienda(
+                Vivienda(vivId, modelo, precio, propId, dirId),
+                Direccion(dirId, ciudad, calle, piso)
             )
-            repository.actualizar(viviendaEditada)
-            cargarDatos()
+            cargarDesdeLocal()
         }
     }
 
     fun borrarVivienda(vivienda: Vivienda) {
         viewModelScope.launch {
             repository.borrar(vivienda)
-            cargarDatos()
+            cargarDesdeLocal()
         }
     }
 }
