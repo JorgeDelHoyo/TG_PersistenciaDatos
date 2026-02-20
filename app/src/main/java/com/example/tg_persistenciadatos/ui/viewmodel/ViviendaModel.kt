@@ -14,10 +14,12 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
 
     var listaViviendas by mutableStateOf<List<Vivienda>>(emptyList())
     var listaPropietarios by mutableStateOf<List<Propietario>>(emptyList())
+    var mapaEtiquetas by mutableStateOf<Map<Int, List<String>>>(emptyMap())
     var isLoading by mutableStateOf(false)
 
+    var listaCaracteristicas by mutableStateOf<List<com.example.tg_persistenciadatos.model.Caracteristica>>(emptyList())
+
     init {
-        // Al arrancar, cargamos lo local primero para evitar pantalla negra
         viewModelScope.launch {
             cargarDesdeLocal()
             actualizarTodo()
@@ -40,6 +42,14 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
     suspend fun cargarDesdeLocal() {
         listaViviendas = repository.obtenerViviendasLocales()
         listaPropietarios = repository.obtenerPropietariosLocales()
+        listaCaracteristicas = repository.obtenerCaracteristicasLocales()
+
+        // Cargar etiquetas para cada vivienda
+        val nuevoMapa = mutableMapOf<Int, List<String>>()
+        listaViviendas.forEach { vivienda ->
+            nuevoMapa[vivienda.id] = repository.obtenerEtiquetasDeVivienda(vivienda.id)
+        }
+        mapaEtiquetas = nuevoMapa
     }
 
     fun getVivienda(id: Int): Vivienda? = listaViviendas.find { it.id == id }
@@ -51,13 +61,16 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
         }
     }
 
-    fun guardarViviendaCompleta(modelo: String, precio: Int, propId: Int, calle: String, ciudad: String, piso: String) {
+    // Sustituye esta función en tu ViviendaViewModel
+    fun guardarViviendaCompleta(modelo: String, precio: Int, propId: Int, calle: String, ciudad: String, piso: String, caracteristicasIds: List<Int>) {
         viewModelScope.launch {
             val dirId = (1000..9999).random()
             val vivId = (10000..99999).random()
+
             repository.guardarNuevaVivienda(
                 Vivienda(vivId, modelo, precio, propId, dirId),
-                Direccion(dirId, ciudad, calle, piso)
+                Direccion(dirId, ciudad, calle, piso),
+                caracteristicasIds // Pasamos los IDs seleccionados
             )
             cargarDesdeLocal()
         }

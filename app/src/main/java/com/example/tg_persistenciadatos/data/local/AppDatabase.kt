@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.tg_persistenciadatos.model.*
 
 @Database(
@@ -14,9 +15,10 @@ import com.example.tg_persistenciadatos.model.*
         Caracteristica::class,
         ViviendaCaracteristicaCrossRef::class // <-- CAMBIADO de Cruce a CrossRef
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class ViviendaDatabase : RoomDatabase() {
 
     abstract fun viviendaDao(): ViviendaDao
