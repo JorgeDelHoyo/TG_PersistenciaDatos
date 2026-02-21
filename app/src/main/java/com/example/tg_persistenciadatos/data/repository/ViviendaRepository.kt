@@ -35,7 +35,6 @@ class ViviendaRepository(private val dao: ViviendaDao) {
                 resD.body()?.let { dao.insertDirecciones(it) }
                 resC.body()?.let { dao.insertCaracteristicas(it) }
 
-                // --- NUEVA LÓGICA DE VINCULACIÓN ---
                 resV.body()?.let { listaViviendas ->
                     dao.insertViviendas(listaViviendas)
 
@@ -52,7 +51,6 @@ class ViviendaRepository(private val dao: ViviendaDao) {
                         }
                     }
                 }
-                // ------------------------------------
             }
         } catch (e: Exception) {
             android.util.Log.e("REPO", "Error en refreshDatos: ${e.message}")

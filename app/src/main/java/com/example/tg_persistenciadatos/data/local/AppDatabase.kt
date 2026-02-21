@@ -13,7 +13,7 @@ import com.example.tg_persistenciadatos.model.*
         Propietario::class,
         Direccion::class,
         Caracteristica::class,
-        ViviendaCaracteristicaCrossRef::class // <-- CAMBIADO de Cruce a CrossRef
+        ViviendaCaracteristicaCrossRef::class
     ],
     version = 3,
     exportSchema = false

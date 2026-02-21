@@ -16,11 +16,9 @@ interface ViviendaDao {
     @Query("SELECT * FROM propietarios")
     suspend fun getAllPropietarios(): List<Propietario>
 
-    // Añade esto en ViviendaDao.kt
     @Query("SELECT * FROM caracteristicas")
     suspend fun getAllCaracteristicas(): List<com.example.tg_persistenciadatos.model.Caracteristica>
 
-    // Esta es la consulta clave que faltaba para las etiquetas
     @Query("""
         SELECT nombre FROM caracteristicas 
         INNER JOIN vivienda_caracteristica_cruce
@@ -44,7 +42,7 @@ interface ViviendaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDireccion(direccion: Direccion)
 
-    // Añade esto en tu ViviendaDao
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCaracteristica(caracteristica: Caracteristica)
 

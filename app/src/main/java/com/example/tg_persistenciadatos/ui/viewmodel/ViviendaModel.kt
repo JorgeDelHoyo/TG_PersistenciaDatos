@@ -61,7 +61,6 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
         }
     }
 
-    // Sustituye esta función en tu ViviendaViewModel
     fun guardarViviendaCompleta(modelo: String, precio: Int, propId: Int, calle: String, ciudad: String, piso: String, caracteristicasIds: List<Int>) {
         viewModelScope.launch {
             val dirId = (1000..9999).random()

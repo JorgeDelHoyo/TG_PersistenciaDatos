@@ -89,7 +89,6 @@ fun PantallaLista(navController: NavController, viewModel: ViviendaViewModel) {
 
                                 Button(
                                     onClick = { viviendaAEliminar = vivienda },
-                                    // Usando clase R para el color
                                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.eliminar)),
                                     modifier = Modifier.weight(1f)
                                 ) {

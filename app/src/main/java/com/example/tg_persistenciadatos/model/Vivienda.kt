@@ -11,6 +11,6 @@ data class Vivienda(
     val precio: Int,
     val propietarioId: Int,
     val direccionId: Int,
-    // Este es el campo clave que lee la lista del JSON:
+    // Campo que lee la lista del JSON
     val caracteristicasId: List<Int> = emptyList()
 )
