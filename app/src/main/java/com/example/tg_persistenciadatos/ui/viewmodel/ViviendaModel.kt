@@ -38,7 +38,7 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
             isLoading = false
         }
     }
-
+    //Recarga la lista para mostrar la nueva información
     suspend fun cargarDesdeLocal() {
         listaViviendas = repository.obtenerViviendasLocales()
         listaPropietarios = repository.obtenerPropietariosLocales()
@@ -61,7 +61,10 @@ class ViviendaViewModel(private val repository: ViviendaRepository) : ViewModel(
         }
     }
 
-    // Sustituye esta función en tu ViviendaViewModel
+    /**
+     * Recibe datos del formulario
+     * Genera IDs aleatorios
+     */
     fun guardarViviendaCompleta(modelo: String, precio: Int, propId: Int, calle: String, ciudad: String, piso: String, caracteristicasIds: List<Int>) {
         viewModelScope.launch {
             val dirId = (1000..9999).random()

@@ -10,17 +10,21 @@ import com.example.tg_persistenciadatos.model.ViviendaCaracteristicaCrossRef
 @Dao
 interface ViviendaDao {
 
+    //consultas get
     @Query("SELECT * FROM viviendas")
     suspend fun getAllViviendas(): List<Vivienda>
 
     @Query("SELECT * FROM propietarios")
     suspend fun getAllPropietarios(): List<Propietario>
 
-    // Añade esto en ViviendaDao.kt
     @Query("SELECT * FROM caracteristicas")
     suspend fun getAllCaracteristicas(): List<com.example.tg_persistenciadatos.model.Caracteristica>
 
-    // Esta es la consulta clave que faltaba para las etiquetas
+    /**
+     * Consulta Avanzada (JOIN):
+     * Busca en la tabla intermedia las relaciones que coincidan con la viviendaId.
+     * Luego, cruza esos datos con la tabla de características para sacar el nombre de la etiqueta.
+     */
     @Query("""
         SELECT nombre FROM caracteristicas 
         INNER JOIN vivienda_caracteristica_cruce
@@ -29,6 +33,8 @@ interface ViviendaDao {
     """)
     suspend fun getEtiquetasPorVivienda(viviendaId: Int): List<String>
 
+    //inserts
+    // OnConflictStrategy.REPLACE actualiza el dato si el ID ya existe.
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertViviendas(viviendas: List<Vivienda>)
 
@@ -44,13 +50,17 @@ interface ViviendaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDireccion(direccion: Direccion)
 
-    // Añade esto en tu ViviendaDao
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCaracteristica(caracteristica: Caracteristica)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCaracteristicas(caracteristicas: List<com.example.tg_persistenciadatos.model.Caracteristica>)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertCrossRef(crossRef: ViviendaCaracteristicaCrossRef)
+
+    //deletes
+    //borrado masivo de datos para que no de problemas al cargar la api
     @Query("DELETE FROM caracteristicas")
     suspend fun deleteAllCaracteristicas()
 
@@ -60,15 +70,6 @@ interface ViviendaDao {
     @Query("SELECT id FROM caracteristicas WHERE nombre = :nombre LIMIT 1")
     suspend fun getCaracteristicaIdPorNombre(nombre: String): Int?
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertCrossRef(crossRef: ViviendaCaracteristicaCrossRef)
-
-    @Update
-    suspend fun updateVivienda(vivienda: Vivienda)
-
-    @Delete
-    suspend fun deleteVivienda(vivienda: Vivienda)
-
     @Query("DELETE FROM viviendas")
     suspend fun deleteAllViviendas()
 
@@ -77,5 +78,15 @@ interface ViviendaDao {
 
     @Query("DELETE FROM direcciones")
     suspend fun deleteAllDirecciones()
+
+    //actualizador de la vivienda
+    @Update
+    suspend fun updateVivienda(vivienda: Vivienda)
+
+    //borrado de una vivienda concreta
+    @Delete
+    suspend fun deleteVivienda(vivienda: Vivienda)
+
+
 
 }

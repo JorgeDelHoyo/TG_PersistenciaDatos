@@ -3,6 +3,11 @@ package com.example.tg_persistenciadatos.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 
+/**
+ * Tabla intermedia para resolver la relación Muchos a Muchos (N:M).
+ * Una vivienda puede tener muchas características, y una característica
+ * puede pertenecer a muchas viviendas.
+ */
 @Entity(
     tableName = "vivienda_caracteristica_cruce",
     primaryKeys = ["viviendaId", "caracteristicaId"],

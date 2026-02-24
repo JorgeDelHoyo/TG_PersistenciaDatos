@@ -110,7 +110,6 @@ fun PantallaFormulario(navController: NavController, viewModel: ViviendaViewMode
                         }
                     }
                 }
-                // ---------------------------------------------
             }
 
             Spacer(modifier = Modifier.height(16.dp))

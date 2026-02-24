@@ -11,6 +11,8 @@ data class Vivienda(
     val precio: Int,
     val propietarioId: Int,
     val direccionId: Int,
-    // Este es el campo clave que lee la lista del JSON:
+
+    // Lista de IDs que viene del JSON de la API.
+    // Room necesita la clase Converters para saber cómo guardar esta lista.
     val caracteristicasId: List<Int> = emptyList()
 )
